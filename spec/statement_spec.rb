@@ -1,13 +1,13 @@
 require File.expand_path("../spec_helper", __FILE__)
 require 'rdbi-driver-jdbc'
 
-describe RDBI::Driver::JDBC::Statement do
+describe "RDBI::Driver::JDBC::Statement" do
   let(:dbh) { init_database }
-  let(:sth) { dbh.new_statement "SELECT * FROM TB1 WHERE COL1 = ?"
+  let(:sth) { dbh.new_statement "SELECT * FROM TB1 WHERE COL1 = ?" }
   subject   { sth }
 
   after :each do
-    sth.finish     if sth and not sth.finished?
+    sth.finish if sth and not sth.finished?
     dbh.disconnect if dbh and dbh.connected?
   end
 
@@ -15,51 +15,69 @@ describe RDBI::Driver::JDBC::Statement do
   it { should be_a RDBI::Driver::JDBC::Statement }
   it { should be_a RDBI::Statement }
 
-  specify "#new_execution" do
-    rs = sth.new_execution("A")
-    rs.should_not be_nil
-    rs.should be_an Array
-    rs[0].should be_an RDBI::Driver::JDBC::Cursor
-    rs[1].should be_an RDBI::Schema
-    rs[2].should be_an Hash
+  describe "#new_execution" do
+    let(:rs) { sth.new_execution "A" }
+    subject  { rs }
 
-    rs[1][:columns][0][:name].should        == :COL1
-    rs[1][:columns][0][:type].should        == "CHAR"
-    rs[1][:columns][0][:ruby_type].should   == :default
-    rs[1][:columns][0][:precision].should   == 0
-    rs[1][:columns][0][:scale].should       == 0
-    rs[1][:columns][0][:nullable].should    == true
-    rs[1][:columns][0][:table].should       == "TB1"
-    rs[1][:columns][0][:primary_key].should == false
+    it { should_not be_nil }
+    it { should be_an Array }
 
-    rs[1][:columns][1][:name].should        == :COL2
-    rs[1][:columns][1][:type].should        == "INTEGER"
-    rs[1][:columns][1][:ruby_type].should   == :integer
-    rs[1][:columns][1][:precision].should   == 10
-    rs[1][:columns][1][:scale].should       == 0
-    rs[1][:columns][1][:nullable].should    == true
-    rs[1][:columns][1][:table].should       == "TB1"
-    rs[1][:columns][1][:primary_key].should == false
+    specify "it should return the correct types" do
+      rs[0].should be_an RDBI::Driver::JDBC::Cursor
+      rs[1].should be_an RDBI::Schema
+      rs[2].should be_an Hash
 
-    rs[1][:tables].should == ["TB1"]
+      rs[1][:tables].should == ["TB1"]
+    end
+
+    context "rs[1][:columns][0]" do
+      subject { rs[1][:columns][0] }
+
+      its(:name)        { should == :COL1    }
+      its(:type)        { should == "CHAR"   }
+      its(:ruby_type)   { should == :default }
+      its(:precision)   { should == 0        }
+      its(:scale)       { should == 0        }
+      its(:nullable)    { should == true     }
+      its(:table)       { should == "TB1"    }
+      its(:primary_key) { should == false    }
+    end
+
+    context "rs[1][:columns[1]" do
+      subject { rs[1][:columns][1] }
+
+      its(:name)        { should == :COL2     }
+      its(:type)        { should == "INTEGER" }
+      its(:ruby_type)   { should == :integer  }
+      its(:precision)   { should == 10        }
+      its(:scale)       { should == 0         }
+      its(:nullable)    { should == true      }
+      its(:table)       { should == "TB1"     }
+      its(:primary_key) { should == false     }
+    end
   end
 
-  specify "#execute" do
-    rs = sth.execute("A")
-    rs.should_not be_nil
-    rs.should be_an RDBI::Result
+  describe "#execute" do
+    let(:rs) { sth.execute("A") }
+    subject  { rs }
 
-    r = rs.fetch(:first)
-    r[0].should == "A"
-    r[1].should == 1
+    it { should_not be_nil }
+    it { should be_an RDBI::Result }
 
-    r = rs.as(:Struct).fetch(:first)
-    r[:COL1].should == "A"
-    r[:COL2].should == 1
+    it "should return correct results" do
+      r = rs.fetch(:first)
+      r[0].should == "A"
+      r[1].should == 1
+
+      r = rs.as(:Struct).fetch(:first)
+      r[:COL1].should == "A"
+      r[:COL2].should == 1
+    end
   end
 
   specify "#finish" do
     sth.finished?.should be_false
+
     sth.finish
     sth.finished?.should be_true
   end
@@ -86,9 +104,9 @@ describe RDBI::Driver::JDBC::Statement do
     end
   end
 
-  describe "@output_type_map[:time]" do
+  context "@output_type_map[:time]" do
     let(:rs) { dbh.execute "SELECT COL4 FROM TB2" }
-    let(:r)  { rs.as(:Struct).fetch(:first)
+    let(:r)  { rs.as(:Struct).fetch(:first) }
 
     specify "::JDBC::Time" do
       r[:COL4].should be_a Time

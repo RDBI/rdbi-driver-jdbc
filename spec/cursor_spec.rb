@@ -1,7 +1,7 @@
 require File.expand_path("../spec_helper", __FILE__)
 require 'rdbi-driver-jdbc'
 
-describe RDBI::Driver::JDBC::Cursor do
+describe "RDBI::Driver::JDBC::Cursor" do
   let(:dbh) { init_database }
   let(:sth) { dbh.new_statement "SELECT * FROM TB1" }
   let(:cur) { sth.new_execution[0] }
@@ -16,9 +16,9 @@ describe RDBI::Driver::JDBC::Cursor do
   it { should be_a RDBI::Driver::JDBC::Cursor }
   it { should be_a RDBI::Cursor }
 
-  its(:result_count)  { should == 3 }
-  its(:affected_count){ should == 0 }
-  its(:size)          { should == 3 }
+  its(:result_count)   { should == 3 }
+  its(:affected_count) { should == 0 }
+  its(:size)           { should == 3 }
 
   specify "#next_row" do
     cur.next_row.should == ["A", 1]
@@ -36,20 +36,20 @@ describe RDBI::Driver::JDBC::Cursor do
   end
 
   specify "#rest" do
-    cur.rest.should == [["A", 1],["B", 2],["C", 3]]
+    cur.rest.should == [["A", 1],["B", 2],["C", 3],]
     cur.next_row
-    cur.rest.should == [["B", 2],["C", 3]]
+    cur.rest.should == [["B", 2],["C", 3],]
   end
 
   specify "#all" do
-    cur.all.should == [["A", 1],["B", 2],["C", 3]]
+    cur.all.should == [["A", 1],["B", 2],["C", 3],]
   end
 
   specify "#fetch" do
-    cur.fetch.should == [["A", 1]]
-    cur.fetch(2).should == [["A", 1],["B", 2]]
-    cur.fetch(3).should == [["A", 1],["B", 2],["C", 3]]
-    cur.fetch(4).should == [["A", 1],["B", 2],["C", 3]]
+    cur.fetch.should    == [["A", 1],]
+    cur.fetch(2).should == [["A", 1],["B", 2],]
+    cur.fetch(3).should == [["A", 1],["B", 2],["C", 3],]
+    cur.fetch(4).should == [["A", 1],["B", 2],["C", 3],]
 
     3.times{cur.next_row}
     cur.fetch.should == []
@@ -74,7 +74,7 @@ describe RDBI::Driver::JDBC::Cursor do
     cur.empty?.should be_false
 
     sth.finish
-    sth = dbh.new_statement("SELECT * FROM TB1 WHERE COL1 = 'D'")
+    sth = dbh.new_statement "SELECT * FROM TB1 WHERE COL1 = 'D'"
     cur = sth.new_execution[0]
     cur.empty?.should be_true
   end
@@ -82,6 +82,7 @@ describe RDBI::Driver::JDBC::Cursor do
   specify "#rewind" do
     cur.next_row.should == ["A", 1]
     cur.next_row.should == ["B", 2]
+
     cur.rewind
     cur.next_row.should == ["A", 1]
   end
@@ -91,6 +92,6 @@ describe RDBI::Driver::JDBC::Cursor do
   end
 
   specify "#coerce_to_array" do
-    cur.coerce_to_array.should == [["A", 1],["B", 2],["C", 3]]
+    cur.coerce_to_array.should == [["A", 1],["B", 2],["C", 3],]
   end
 end
