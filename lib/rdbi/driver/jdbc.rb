@@ -1,3 +1,4 @@
+require 'java'
 require 'rdbi'
 require 'rubygems'
 
@@ -22,7 +23,7 @@ class RDBI::Driver::JDBC < RDBI::Driver
       password = @connect_args[:password] || @connect_args[:pass]
 
       @handle = java.sql.DriverManager.getConnection(
-                  "jdbc:#{database}"
+                  "jdbc:#{database}",
                   username,
                   password
                 )
@@ -91,8 +92,9 @@ class RDBI::Driver::JDBC < RDBI::Driver
 
   end
 
-  class Database < RDBI::Cursor
+  class Cursor < RDBI::Cursor
   end
 
   class Statement < RDBI::Statement
+  end
 end
