@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "rdbi-driver-jdbc"
   s.version     = "0.1.0"
-  s.platform    = Gem::Platform::JRUBY
+  s.platform    = "java"
   s.authors     = ["Shane Emmons"]
   s.email       = "semmons99@gmail.com"
   s.homepage    = "https://github.com/semmons99/rdbi-driver-jdbc"
