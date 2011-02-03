@@ -1,5 +1,6 @@
 require File.expand_path("../spec_helper", __FILE__)
 require 'rdbi-driver-jdbc'
+require 'time'
 
 describe "RDBI::Driver::JDBC::Statement" do
   let(:dbh) { init_database }
@@ -27,7 +28,7 @@ describe "RDBI::Driver::JDBC::Statement" do
       rs[1].should be_an RDBI::Schema
       rs[2].should be_an Hash
 
-      rs[1][:tables].should == ["TB1"]
+      rs[1][:tables].should == ["tb1"]
     end
 
     context "rs[1][:columns][0]" do
@@ -36,10 +37,10 @@ describe "RDBI::Driver::JDBC::Statement" do
       its(:name)        { should == :COL1    }
       its(:type)        { should == "CHAR"   }
       its(:ruby_type)   { should == :default }
-      its(:precision)   { should == 0        }
+      its(:precision)   { should == 1        }
       its(:scale)       { should == 0        }
       its(:nullable)    { should == true     }
-      its(:table)       { should == "TB1"    }
+      its(:table)       { should == "tb1"    }
       its(:primary_key) { should == false    }
     end
 
@@ -49,10 +50,10 @@ describe "RDBI::Driver::JDBC::Statement" do
       its(:name)        { should == :COL2     }
       its(:type)        { should == "INTEGER" }
       its(:ruby_type)   { should == :integer  }
-      its(:precision)   { should == 10        }
+      its(:precision)   { should == 11        }
       its(:scale)       { should == 0         }
       its(:nullable)    { should == true      }
-      its(:table)       { should == "TB1"     }
+      its(:table)       { should == "tb1"     }
       its(:primary_key) { should == false     }
     end
   end
@@ -80,37 +81,5 @@ describe "RDBI::Driver::JDBC::Statement" do
 
     sth.finish
     sth.finished?.should be_true
-  end
-
-  context "@output_type_map[:date]" do
-    let(:rs) { dbh.execute "SELECT COL1 FROM TB2" }
-    let(:r)  { rs.as(:Struct).fetch(:first) }
-
-    specify "::JDBC::Date" do
-      r[:COL1].should be_a Date
-      r[:COL1].should == Date.parse("2010-01-01")
-    end
-  end
-
-  context "@output_type_map[:datetime]" do
-    let(:rs) { dbh.execute "SELECT COL2, COL3 FROM TB2" }
-    let(:r)  { rs.as(:Struct).fetch(:first) }
-
-    specify "::JDBC::TimeStamp" do
-      r[:COL2].should be_a DateTime
-      r[:COL3].should be_a DateTime
-      r[:COL2].should == DateTime.parse("2010-01-01 12:00:00")
-      r[:COL3].should == DateTime.parse("2010-01-01 12:00:00")
-    end
-  end
-
-  context "@output_type_map[:time]" do
-    let(:rs) { dbh.execute "SELECT COL4 FROM TB2" }
-    let(:r)  { rs.as(:Struct).fetch(:first) }
-
-    specify "::JDBC::Time" do
-      r[:COL4].should be_a Time
-      r[:COL4].should == Time.parse("12:00:00")
-    end
   end
 end

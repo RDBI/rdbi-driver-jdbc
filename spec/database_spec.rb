@@ -58,7 +58,7 @@ describe "RDBI::Driver::JDBC::Database" do
 
       it { should be_a RDBI::Schema }
 
-      its(:tables) { should == ["TB1"] }
+      its(:tables) { should == ["tb1"] }
 
       context "ts[:columns][0]" do
         subject { ts[:columns][0] }
@@ -66,10 +66,10 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL1    }
         its(:type)        { should == "CHAR"   }
         its(:ruby_type)   { should == :default }
-        its(:precision)   { should == 0        }
+        its(:precision)   { should == 1        }
         its(:scale)       { should == 0        }
         its(:nullable)    { should == true     }
-        its(:table)       { should == "TB1"    }
+        its(:table)       { should == "tb1"    }
         its(:primary_key) { should == false    }
       end
 
@@ -79,10 +79,10 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL2     }
         its(:type)        { should == "INTEGER" }
         its(:ruby_type)   { should == :integer  }
-        its(:precision)   { should == 10        }
+        its(:precision)   { should == 11        }
         its(:scale)       { should == 0         }
         its(:nullable)    { should == true      }
-        its(:table)       { should == "TB1"     }
+        its(:table)       { should == "tb1"     }
         its(:primary_key) { should == false     }
       end
     end
@@ -93,7 +93,7 @@ describe "RDBI::Driver::JDBC::Database" do
 
       it { should be_a RDBI::Schema }
 
-      its(:tables) { should == ["TB3"] }
+      its(:tables) { should == ["tb3"] }
 
       context "ts[:columns][0]" do
         subject { ts[:columns][0] }
@@ -101,10 +101,10 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL1     }
         its(:type)        { should == "INTEGER" }
         its(:ruby_type)   { should == :integer  }
-        its(:precision)   { should == 10        }
+        its(:precision)   { should == 11        }
         its(:scale)       { should == 0         }
         its(:nullable)    { should == false     }
-        its(:table)       { should == "TB3"     }
+        its(:table)       { should == "tb3"     }
         its(:primary_key) { should == true      }
       end
     end
@@ -133,7 +133,7 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL1    }
         its(:type)        { should == "CHAR"   }
         its(:ruby_type)   { should == :default }
-        its(:precision)   { should == 0        }
+        its(:precision)   { should == 1        }
         its(:scale)       { should == 0        }
         its(:nullable)    { should == true     }
         its(:table)       { should == "tb1"    }
@@ -146,7 +146,7 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL2     }
         its(:type)        { should == "INTEGER" }
         its(:ruby_type)   { should == :integer  }
-        its(:precision)   { should == 10        }
+        its(:precision)   { should == 11        }
         its(:scale)       { should == 0         }
         its(:nullable)    { should == true      }
         its(:table)       { should == "tb1"     }
@@ -196,7 +196,7 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:ruby_type)   { should == :timestamp  }
         its(:precision)   { should == 19          }
         its(:scale)       { should == 0           }
-        its(:nullable)    { should == true        }
+        its(:nullable)    { should == false       }
         its(:table)       { should == "tb2"       }
         its(:primary_key) { should == false       }
       end
@@ -229,7 +229,7 @@ describe "RDBI::Driver::JDBC::Database" do
         its(:name)        { should == :COL1     }
         its(:type)        { should == "INTEGER" }
         its(:ruby_type)   { should == :integer  }
-        its(:precision)   { should == 10        }
+        its(:precision)   { should == 11        }
         its(:scale)       { should == 0         }
         its(:nullable)    { should == false     }
         its(:table)       { should == "tb3"     }
