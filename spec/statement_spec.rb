@@ -56,6 +56,14 @@ describe "RDBI::Driver::JDBC::Statement" do
       its(:table)       { should == "tb1"     }
       its(:primary_key) { should == false     }
     end
+
+    context "aggregate columns" do
+      let(:sth) { dbh.new_statement "SELECT COUNT(*) FROM TB1" }
+
+      it "shouldn't raise an exception" do
+        expect{ sth.new_execution }.to_not raise_error
+      end
+    end
   end
 
   describe "#execute" do

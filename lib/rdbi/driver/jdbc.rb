@@ -301,7 +301,7 @@ class RDBI::Driver::JDBC < RDBI::Driver
 
           columns << newcol
         end
-        tables = columns.map(&:table).uniq
+        tables = columns.map(&:table).uniq.reject{|t| t == ""}
 
         primary_keys = Hash.new{|h,k| h[k] = []}
         tables.each do |tbl|
