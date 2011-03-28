@@ -276,8 +276,9 @@ class RDBI::Driver::JDBC < RDBI::Driver
     def initialize(query, dbh)
       super
 
-      @handle = @dbh.handle.prepareStatement(query)
-      @output_type_map = RDBI::Type.create_type_hash(RDBI::Type::Out)
+      @handle          = @dbh.handle.prepareStatement(query)
+      @input_type_map  = build_input_type_map
+      @output_type_map = build_output_type_map
     end
 
     def new_execution(*binds)
@@ -335,6 +336,51 @@ class RDBI::Driver::JDBC < RDBI::Driver
 
     private
 
+    def build_input_type_map
+      input_type_map = RDBI::Type.create_type_hash(RDBI::Type::In)
+
+      input_type_map[NilClass] = [TypeLib::Filter.new(
+        proc{|o| o.nil?},
+        proc{|o| java.sql.Types::VARCHAR}
+      )]
+
+      input_type_map[String] = [TypeLib::Filter.new(
+        proc{|o| o.is_a? String},
+        proc{|o| java.lang.String.new(o)}
+      )]
+
+      input_type_map[Date] = [TypeLib::Filter.new(
+        proc{|o| o.is_a? Date},
+        proc{|o|
+          cal = apply_date_fields(java.util.Calendar.getInstance, o)
+          java.sql.Date.new(cal.getTime.getTime)
+        }
+      )]
+
+      input_type_map[Time] = [TypeLib::Filter.new(
+        proc{|o| o.is_a? Time},
+        proc{|o|
+          cal = apply_time_fields(java.util.Calendar.getInstance, o)
+          java.sql.Time.new(cal.getTime.getTime)
+        }
+      )]
+
+      input_type_map[DateTime] = [TypeLib::Filter.new(
+        proc{|o| o.is_a? DateTime},
+        proc{|o|
+          cal = apply_date_fields(java.util.Calendar.getInstance, o)
+          cal = apply_time_fields(cal, o)
+          java.sql.Timestamp.new(cal.getTime.getTime)
+        }
+      )]
+
+      input_type_map
+    end
+
+    def build_output_type_map
+      RDBI::Type.create_type_hash(RDBI::Type::Out)
+    end
+
     def apply_bindings(*binds)
       @handle.clearParameters
       binds.each_with_index do |val, n|
@@ -345,26 +391,19 @@ class RDBI::Driver::JDBC < RDBI::Driver
     def bind_param(val, n)
       case val
       when nil
-        @handle.setNull(n, java.sql.Types::VARCHAR)
+        @handle.setNull(n, val)
       when String
-        @handle.setString(n, java.lang.String.new(val))
+        @handle.setString(n, val)
       when Fixnum
         @handle.setLong(n, val)
       when Numeric
         @handle.setDouble(n, val)
       when Date
-        cal = apply_date_fields(java.util.Calendar.getInstance, val)
-
-        @handle.setDate(n, java.sql.Date.new(cal.getTime.getTime))
+        @handle.setDate(n, val)
       when Time
-        cal = apply_time_fields(java.util.Calendar.getInstance, val)
-
-        @handle.setTime(n, java.sql.Time.new(cal.getTime.getTime))
+        @handle.setTime(n, val)
       when DateTime
-        cal = apply_date_fields(java.util.Calendar.getInstance, val)
-        cal = apply_time_fields(cal, val)
-
-        @handle.setTimestamp(n, java.sql.Timestamp.new(cal.getTime.getTime))
+        @handle.setTimestamp(n, val)
       else
         @handle.setObject(n, val)
       end
